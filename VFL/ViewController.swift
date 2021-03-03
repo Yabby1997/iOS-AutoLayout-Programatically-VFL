@@ -42,7 +42,8 @@ class ViewController: UIViewController {
     let welcomeLabel: UILabel = {
         let label = UILabel()
         label.text = "Welcome to Swift"
-        label.font = .boldSystemFont(ofSize: 18)
+        label.textAlignment = .center
+        label.font = .boldSystemFont(ofSize: 35)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -51,6 +52,7 @@ class ViewController: UIViewController {
         let label = UILabel()
         label.text = "Swift는 macOS, iOS, iPadOS, watchOS, tvOS앱을 개발하기 위한 최적의 언어입니다."
         label.textAlignment = .center
+        label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -59,6 +61,9 @@ class ViewController: UIViewController {
         let pageControl = UIPageControl()
         pageControl.numberOfPages = 5
         pageControl.currentPage = 0
+        pageControl.tintColor = UIColor.red
+        pageControl.pageIndicatorTintColor = UIColor.black
+        pageControl.currentPageIndicatorTintColor = UIColor.orange
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         return pageControl
     }()
@@ -74,15 +79,14 @@ class ViewController: UIViewController {
         view.addSubview(summaryLabel)
         view.addSubview(pageControl)
         
-        swiftImageView.isHidden = true
-        welcomeLabel.isHidden = true
-        summaryLabel.isHidden = true
-        pageControl.isHidden = true
-        
         let views: [String: Any] = [
             "appleImageView": appleImageView,
             "appLabel": appLabel,
-            "skipButton": skipButton
+            "skipButton": skipButton,
+            "swiftImageView": swiftImageView,
+            "welcomeLabel": welcomeLabel,
+            "summaryLabel": summaryLabel,
+            "pageControl": pageControl
         ]
 
         var allConstraints: [NSLayoutConstraint] = []
@@ -114,6 +118,48 @@ class ViewController: UIViewController {
             views: views
         )
         allConstraints += topRowHorizontalConstraints
+        
+        let iconToImageVerticalConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "V:[appleImageView]-10-[swiftImageView]",
+            metrics: nil,
+            views: views
+        )
+        allConstraints += iconToImageVerticalConstraints
+        
+        let imageToWelcomeVerticalConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "V:[swiftImageView(500)]-10-[welcomeLabel]",
+            metrics: nil,
+            views: views
+        )
+        allConstraints += imageToWelcomeVerticalConstraints
+        
+        let welcomeHorizontalConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|-15-[welcomeLabel]-15-|",
+            metrics: nil,
+            views: views
+        )
+        allConstraints += welcomeHorizontalConstraints
+        
+        let summaryLabelVerticalConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "V:[welcomeLabel]-4-[summaryLabel]",
+            metrics: nil,
+            views: views
+        )
+        allConstraints += summaryLabelVerticalConstraints
+        
+        let summaryHorizontalConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|-15-[summaryLabel]-15-|",
+            metrics: nil,
+            views: views
+        )
+        allConstraints += summaryHorizontalConstraints
+        
+        let summaryToPageVerticalConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "V:[summaryLabel]-15-[pageControl(9)]-15-|",
+            metrics: nil,
+            views: views
+        )
+        allConstraints += summaryToPageVerticalConstraints
         
         NSLayoutConstraint.activate(allConstraints)
     }
