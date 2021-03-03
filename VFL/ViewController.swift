@@ -69,12 +69,27 @@ class ViewController: UIViewController {
     }()
     
     private enum Metrics {
-        static let padding: CGFloat = 15.0
-        static let iconImageViewWidth: CGFloat = 30.0
+        static let verticalPadding: CGFloat = 20.0
+        static let horizontalPadding: CGFloat = 15.0
+        static let appleImageViewWidth: CGFloat = 30.0
+        static let swiftImageViewWidth: CGFloat = 100
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    private var allConstraints: [NSLayoutConstraint] = []
+    
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        
+        if !allConstraints.isEmpty {
+            NSLayoutConstraint.deactivate(allConstraints)
+            allConstraints.removeAll()
+        }
+        
+        let newInsets = view.safeAreaInsets
+        let leftMargin = newInsets.left > 0 ? newInsets.left : Metrics.horizontalPadding
+        let rightMargin = newInsets.right > 0 ? newInsets.right : Metrics.horizontalPadding
+        let topMargin = newInsets.top > 0 ? newInsets.top : Metrics.verticalPadding
+        let bottomMargin = newInsets.bottom > 0 ? newInsets.bottom : Metrics.verticalPadding
         
         view.addSubview(appleImageView)
         view.addSubview(appLabel)
@@ -95,26 +110,37 @@ class ViewController: UIViewController {
         ]
         
         let metrics = [
-          "horizontalPadding": Metrics.padding,
-          "iconImageViewWidth": Metrics.iconImageViewWidth
+            "verticalPadding": Metrics.verticalPadding,
+            "horizontalPadding": Metrics.horizontalPadding,
+            "appleImageViewWidth": Metrics.appleImageViewWidth,
+            "swiftImageViewWidth": Metrics.swiftImageViewWidth,
+            "topMargin": topMargin,
+            "bottomMargin": bottomMargin,
+            "leftMargin": leftMargin,
+            "rightMargin": rightMargin,
         ]
-        
-        var allConstraints: [NSLayoutConstraint] = []
 
         let iconVerticalConstraints = NSLayoutConstraint.constraints(
-            withVisualFormat: "V:|-50-[appleImageView(iconImageViewWidth)]",
+            withVisualFormat: "V:|-topMargin-[appleImageView(appleImageViewWidth)]",
             metrics: metrics,
             views: views
         )
         allConstraints += iconVerticalConstraints
 
         let topRowHorizontalConstraints = NSLayoutConstraint.constraints(
-            withVisualFormat: "H:|-horizontalPadding-[appleImageView(iconImageViewWidth)]-[appLabel]-[skipButton]-horizontalPadding-|",
+            withVisualFormat: "H:|-leftMargin-[appleImageView(appleImageViewWidth)]-[appLabel]-[skipButton]-rightMargin-|",
             options: [.alignAllCenterY],
             metrics: metrics,
             views: views
         )
         allConstraints += topRowHorizontalConstraints
+        
+        let summaryHorizontalConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|-leftMargin-[summaryLabel]-rightMargin-|",
+            metrics: metrics,
+            views: views
+        )
+        allConstraints += summaryHorizontalConstraints
         
         let iconToImageVerticalConstraints = NSLayoutConstraint.constraints(
             withVisualFormat: "V:[appleImageView]-10-[swiftImageView]",
@@ -123,12 +149,13 @@ class ViewController: UIViewController {
         )
         allConstraints += iconToImageVerticalConstraints
         
-        let summaryHorizontalConstraints = NSLayoutConstraint.constraints(
-            withVisualFormat: "H:|-horizontalPadding-[summaryLabel]-horizontalPadding-|",
+        let imageToWelcomeVerticalConstraints = NSLayoutConstraint.constraints(
+            withVisualFormat: "V:[swiftImageView(swiftImageViewWidth)]-10-[welcomeLabel]",
+            options: [.alignAllCenterX],
             metrics: metrics,
             views: views
         )
-        allConstraints += summaryHorizontalConstraints
+        allConstraints += imageToWelcomeVerticalConstraints
         
         let summaryLabelVerticalConstraints = NSLayoutConstraint.constraints(
             withVisualFormat: "V:[welcomeLabel]-4-[summaryLabel]",
@@ -138,25 +165,17 @@ class ViewController: UIViewController {
         )
         allConstraints += summaryLabelVerticalConstraints
         
-        let imageToWelcomeVerticalConstraints = NSLayoutConstraint.constraints(
-            withVisualFormat: "V:[swiftImageView(300)]-10-[welcomeLabel]",
-            options: [.alignAllCenterX],
-            metrics: nil,
-            views: views
-        )
-        allConstraints += imageToWelcomeVerticalConstraints
-        
         let swiftImageHeightConstraints = NSLayoutConstraint.constraints(
-            withVisualFormat: "H:[swiftImageView(300)]",
-            metrics: nil,
+            withVisualFormat: "H:[swiftImageView(swiftImageViewWidth)]",
+            metrics: metrics,
             views: views
         )
         allConstraints += swiftImageHeightConstraints
         
         let summaryToPageVerticalConstraints = NSLayoutConstraint.constraints(
-            withVisualFormat: "V:[summaryLabel]-15-[pageControl(9)]-15-|",
+            withVisualFormat: "V:[summaryLabel]-verticalPadding-[pageControl(9)]-bottomMargin-|",
             options: [.alignAllCenterX],
-            metrics: nil,
+            metrics: metrics,
             views: views
         )
         allConstraints += summaryToPageVerticalConstraints
